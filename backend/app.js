@@ -11,6 +11,7 @@ import groupModel from "./models/groupModel.js";
 import { calculateNetBalances } from "./helpers/calculateNetBalances.js";
 import { createFlowGraphMatrix } from "./helpers/createFlowGraphMatrix.js";
 import { maxFlowAlgo } from "./helpers/maxFlowAlgo.js";
+import transporter from "./utils/mailer.js";
 const JWT_SECRET = "your-secret-key";
 const app = express();
 const PORT = 3000;
@@ -438,6 +439,28 @@ app.get("/api/groups/:groupId/res_transactions", authenticateToken, async (req, 
   }
 });
 
+app.post("/api/send-invite", async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ error: "Email is required" });
+  }
+
+  try {
+    const mailOptions = {
+      from: "harshalrelan99@gmail.com",
+      to: email,
+      subject: "You're invited to SplitEase!",
+      text: `Hey there! 👋\n\nYou’ve been invited to join a group on SplitEase.\n\nhttp://localhost:5173/register\n\n- Team SplitEase`,
+    };
+
+    await transporter.sendMail(mailOptions);
+    res.status(200).json({ message: "Invite email sent successfully" });
+  } catch (error) {
+    console.error("Error sending email:", error);
+    res.status(500).json({ error: "Failed to send email" });
+  }
+});
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

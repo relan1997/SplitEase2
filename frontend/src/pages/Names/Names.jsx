@@ -37,13 +37,12 @@ const Names = ({ groupId }) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return re.test(String(email).toLowerCase());
   };
-  
 
   const checkUsername = async () => {
     if (!username.trim()) return;
-  
+
     const token = localStorage.getItem("token");
-  
+
     try {
       const res = await axios.get(
         `http://localhost:3000/api/user-exists?username=${username}`,
@@ -62,7 +61,7 @@ const Names = ({ groupId }) => {
       setIsValid(false);
     }
   };
-  
+
   const handleInviteClick = () => {
     setShowEmailInput(true);
   };
@@ -72,7 +71,6 @@ const Names = ({ groupId }) => {
     setEmail(newEmail);
     setIsEmailValid(validateEmail(newEmail));
   };
-  
 
   const handleChange = (e) => {
     setUsername(e.target.value);
@@ -126,6 +124,29 @@ const Names = ({ groupId }) => {
     };
   };
 
+  const handleSendInvite = async () => {
+    const token = localStorage.getItem("token");
+
+    try {
+      const res = await axios.post(
+        "http://localhost:3000/api/send-invite",
+        { email },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      alert("Invitation sent successfully!");
+      setEmail(""); // reset email
+      setShowEmailInput(false); // hide email input
+    } catch (err) {
+      console.error("Error sending invitation:", err);
+      alert("Failed to send invitation.");
+    }
+  };
+
   return (
     <div style={{ padding: "1rem" }}>
       <h2>Add Member to Group</h2>
@@ -141,14 +162,14 @@ const Names = ({ groupId }) => {
       <button onClick={handleAddMember} disabled={!isValid}>
         Add Member
       </button>
-  
+
       {/* Invite button (only shows if username is invalid and email input not shown) */}
       {isValid === false && !showEmailInput && (
         <button onClick={handleInviteClick} style={{ marginLeft: "0.5rem" }}>
           Invite
         </button>
       )}
-  
+
       {/* Email input & Send Invite button */}
       {showEmailInput && (
         <div style={{ marginTop: "1rem" }}>
@@ -163,12 +184,12 @@ const Names = ({ groupId }) => {
               marginRight: "0.5rem",
             }}
           />
-          <button disabled={!isEmailValid}>
+          <button onClick={handleSendInvite} disabled={!isEmailValid}>
             Send Invite
           </button>
         </div>
       )}
-  
+
       <h3 style={{ marginTop: "2rem" }}>Group Members</h3>
       <ul>
         {members.map((member) => (
@@ -177,7 +198,6 @@ const Names = ({ groupId }) => {
       </ul>
     </div>
   );
-  
 };
 
 export default Names;
