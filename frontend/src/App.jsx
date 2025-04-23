@@ -4,7 +4,6 @@ import Login from './pages/Login/Login'
 import Register from './pages/Register/Register'
 import Expense from './pages/Expense/Expense'
 import Split from './pages/Split/Split'
-import Names from './pages/Names/Names'
 import Groups from './pages/Groups/Groups'
 import Results from "./pages/Results/Results"
 
