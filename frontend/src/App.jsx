@@ -19,7 +19,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/expense" element={<Expense />} />
         <Route path="/groups" element={<Groups />} />
-        <Route path="/groups/:groupId" element={<Split />} /> {/* ✅ important! */}
+        <Route path="/groups/:groupId" element={<Split />} /> 
         <Route path="/groups/:groupId/results" element={<Results />} />
       </Routes>
     </div>
