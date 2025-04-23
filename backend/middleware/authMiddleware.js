@@ -1,10 +1,10 @@
 // middleware/authMiddleware.js
 import jwt from "jsonwebtoken";
 
-// Hardcoded secret (note: not recommended for production)
 const JWT_SECRET = "your-secret-key"; // Replace with your actual secret
 
 export const authenticateToken = (req, res, next) => {
+  console.log("Token:", req.headers.authorization); // Debugging line
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
