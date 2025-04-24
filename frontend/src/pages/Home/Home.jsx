@@ -623,28 +623,16 @@ const Home = () => {
 								</span>
 							</div>
 							<div className="flex gap-4 text-sm text-gray-500">
-								<a
-									href="/about"
-									className="hover:text-emerald-600"
-								>
+								<a href="/" className="hover:text-emerald-600">
 									About
 								</a>
-								<a
-									href="/contact"
-									className="hover:text-emerald-600"
-								>
+								<a href="/" className="hover:text-emerald-600">
 									Contact
 								</a>
-								<a
-									href="/privacy"
-									className="hover:text-emerald-600"
-								>
+								<a href="/" className="hover:text-emerald-600">
 									Privacy Policy
 								</a>
-								<a
-									href="/terms"
-									className="hover:text-emerald-600"
-								>
+								<a href="/" className="hover:text-emerald-600">
 									Terms of Service
 								</a>
 							</div>
