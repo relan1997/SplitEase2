@@ -208,7 +208,7 @@ app.post("/api/send-invite", async (req, res) => {
 			from: "harshalrelan99@gmail.com",
 			to: email,
 			subject: "You're invited to SplitEase!",
-			text: `Hey there! 👋\n\nYou’ve been invited to join a group on SplitEase.\n\nhttp://localhost:5173/register\n\n- Team SplitEase`,
+			text: `Hey there! 👋\n\nYou’ve been invited to join a group on SplitEase.\n\nhttps://splitease2-1.onrender.com/register\n\n- Team SplitEase`,
 		};
 
 		await transporter.sendMail(mailOptions);

@@ -99,11 +99,14 @@ const Expense = () => {
 		setLoading(true);
 		try {
 			const token = localStorage.getItem("token");
-			const res = await axios.get("https://splitease2.onrender.com/api/expense", {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			});
+			const res = await axios.get(
+				"https://splitease2.onrender.com/api/expense",
+				{
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				}
+			);
 
 			console.log(res.data.receivedTransactions);
 
