@@ -1,10 +1,20 @@
 import express from "express";
-import { postResults, getResultsTransactions } from "../controllers/resultsController.js";
+import {
+	postResults,
+	getResultsTransactions,
+} from "../controllers/resultsController.js";
 import { authenticateToken } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-router.post("/api/groups/:groupId/results", authenticateToken, postResults);
-router.get("/api/groups/:groupId/res_transactions", authenticateToken, getResultsTransactions);
+// POST route for creating results
+router.get("/groups/:groupId/results", authenticateToken, postResults);
+
+// GET route for fetching results - match the endpoint used in the React component
+router.get(
+	"/api/groups/:groupId/results",
+	authenticateToken,
+	getResultsTransactions
+);
 
 export default router;

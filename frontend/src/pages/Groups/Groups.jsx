@@ -25,6 +25,8 @@ const Groups = () => {
 	const [searching, setSearching] = useState(false);
 	const [selectedGroup, setSelectedGroup] = useState(null);
 	const [notification, setNotification] = useState(null);
+	const [inviteEmail, setInviteEmail] = useState("");
+	const [showEmailInput, setShowEmailInput] = useState(false);
 	const navigate = useNavigate();
 
 	useEffect(() => {
@@ -50,6 +52,8 @@ const Groups = () => {
 						headers: { Authorization: `Bearer ${token}` },
 					}
 				);
+
+				console.log("Groups response:", res.data);
 				setGroups(res.data);
 				setLoading(false);
 			} catch (error) {
@@ -66,6 +70,7 @@ const Groups = () => {
 	}, [navigate]);
 
 	const handleCreateGroup = async () => {
+		console.log("Creating group with name:", groupName);
 		if (!groupName.trim()) {
 			showNotification("Please enter a group name", "error");
 			return;
@@ -81,6 +86,7 @@ const Groups = () => {
 					headers: { Authorization: `Bearer ${token}` },
 				}
 			);
+			console.log("Group created:", res.data);
 			setGroups([...groups, res.data]);
 			setGroupName("");
 			showNotification("Group created successfully!", "success");
@@ -111,48 +117,63 @@ const Groups = () => {
 		if (!searchTerm.trim() || !selectedGroup) return;
 
 		setSearching(true);
+		setShowEmailInput(false);
 		try {
 			const token = localStorage.getItem("token");
-			// This would be your actual endpoint to search for users
 			const res = await axios.get(
-				`http://localhost:3000/api/users/search?term=${searchTerm}`,
+				`http://localhost:3000/api/user-exists?username=${searchTerm}`,
 				{
 					headers: { Authorization: `Bearer ${token}` },
 				}
 			);
-			setSearchResults(res.data);
+
+			console.log("Search results:", res.data);
+			if (res.data.exists) {
+				setSearchResults([searchTerm]);
+			} else {
+				setSearchResults([]);
+				setShowEmailInput(true);
+				setInviteEmail(""); // Clear any previous email
+			}
 		} catch (err) {
 			console.error("Error searching for users:", err);
-			// For demonstration purposes, simulate results with existing/non-existing users
-			// In a real app, this would come from your API
-			setTimeout(() => {
-				if (searchTerm.includes("existing")) {
-					setSearchResults([
-						{
-							_id: "123",
-							username: searchTerm,
-							email: `${searchTerm}@example.com`,
-						},
-					]);
-				} else {
-					setSearchResults([]);
-				}
-			}, 500);
+			setSearchResults([]);
+			setShowEmailInput(true);
 		} finally {
 			setSearching(false);
 		}
 	};
 
-	const handleAddUser = async (userId) => {
+	const handleAddUser = async (uname) => {
 		try {
 			const token = localStorage.getItem("token");
-			await axios.post(
+			console.log(`Adding user ${uname} to group ${selectedGroup._id}`);
+			// first check if the user is already a member of the group
+			const groupMembers = await axios.get(
 				`http://localhost:3000/api/groups/${selectedGroup._id}/members`,
-				{ userId },
 				{
 					headers: { Authorization: `Bearer ${token}` },
 				}
 			);
+			console.log("Group members:", groupMembers);
+			const isMember = groupMembers.data.some(
+				(member) => member.username === uname
+			);
+			if (isMember) {
+				showNotification(
+					"User is already a member of the group",
+					"error"
+				);
+				return;
+			}
+			await axios.post(
+				`http://localhost:3000/api/groups/${selectedGroup._id}/members`,
+				{ username: uname },
+				{
+					headers: { Authorization: `Bearer ${token}` },
+				}
+			);
+
 			showNotification("User added to group successfully!", "success");
 			setSearchTerm("");
 			setSearchResults([]);
@@ -162,13 +183,18 @@ const Groups = () => {
 		}
 	};
 
-	const handleInviteUser = async (email) => {
+	const handleInviteUser = async () => {
+		if (!inviteEmail.trim()) {
+			showNotification("Please enter an email address", "error");
+			return;
+		}
+
 		try {
 			const token = localStorage.getItem("token");
 			await axios.post(
 				`http://localhost:3000/api/send-invite`,
 				{
-					email,
+					email: inviteEmail,
 				},
 				{
 					headers: { Authorization: `Bearer ${token}` },
@@ -176,7 +202,8 @@ const Groups = () => {
 			);
 			showNotification("Invitation sent successfully!", "success");
 			setSearchTerm("");
-			setSearchResults([]);
+			setShowEmailInput(false);
+			setInviteEmail("");
 		} catch (err) {
 			console.error("Error sending invitation:", err);
 			showNotification("Failed to send invitation", "error");
@@ -379,7 +406,7 @@ const Groups = () => {
 									</div>
 									<input
 										type="text"
-										placeholder="Search by email or username"
+										placeholder="Search by username"
 										value={searchTerm}
 										onChange={(e) =>
 											setSearchTerm(e.target.value)
@@ -414,15 +441,14 @@ const Groups = () => {
 											>
 												<div>
 													<p className="font-medium">
-														{user.username}
-													</p>
-													<p className="text-sm text-gray-500">
-														{user.email}
+														{searchTerm}
 													</p>
 												</div>
 												<button
 													onClick={() =>
-														handleAddUser(user._id)
+														handleAddUser(
+															searchTerm
+														)
 													}
 													className="bg-emerald-100 text-emerald-600 hover:bg-emerald-200 px-3 py-1 rounded-lg flex items-center text-sm"
 												>
@@ -435,24 +461,36 @@ const Groups = () => {
 											</div>
 										))}
 									</div>
-								) : searchTerm && !searching ? (
+								) : showEmailInput ? (
 									<div className="border rounded-lg p-4">
 										<div className="text-center">
 											<p className="text-gray-500 mb-3">
-												No user found with that email or
-												username.
+												No user found with username "
+												{searchTerm}". Enter an email
+												address to send an invitation:
 											</p>
+											<div className="flex space-x-2 mb-3">
+												<input
+													type="email"
+													placeholder="Email address"
+													value={inviteEmail}
+													onChange={(e) =>
+														setInviteEmail(
+															e.target.value
+														)
+													}
+													className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+												/>
+											</div>
 											<button
-												onClick={() =>
-													handleInviteUser(searchTerm)
-												}
+												onClick={handleInviteUser}
 												className="bg-emerald-100 text-emerald-600 hover:bg-emerald-200 px-4 py-2 rounded-lg flex items-center mx-auto"
 											>
 												<Mail
-													size={18}
+													size={16}
 													className="mr-2"
 												/>
-												Invite {searchTerm}
+												Send Invitation
 											</button>
 										</div>
 									</div>

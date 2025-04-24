@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
+import axios from "axios";
 import {
 	ArrowRightCircle,
 	DollarSign,
@@ -9,6 +10,9 @@ import {
 	Wallet,
 	Receipt,
 	PieChart,
+	FileText,
+	Tag,
+	ArrowLeft,
 } from "lucide-react";
 
 import { useNavigate } from "react-router-dom";
@@ -19,7 +23,39 @@ const Home = () => {
 	const [user, setUser] = useState(null);
 
 	const [isCheckingToken, setIsCheckingToken] = useState(true);
+	const token = localStorage.getItem("token");
+	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState(null);
+	const [groups, setGroups] = useState([]);
+	const [transactionsLoading, setTransactionsLoading] = useState(false);
 	const navigate = useNavigate();
+	const [expenses, setExpenses] = useState([]);
+	const [transactions, setTransactions] = useState([]);
+
+	const categoryColors = {
+		Housing: "bg-blue-100 text-blue-600",
+		Transportation: "bg-purple-100 text-purple-600",
+		Food: "bg-orange-100 text-orange-600",
+		Health: "bg-red-100 text-red-600",
+		Entertainment: "bg-indigo-100 text-indigo-600",
+		Personal: "bg-pink-100 text-pink-600",
+		"Debt & Finances": "bg-emerald-100 text-emerald-600",
+		Shopping: "bg-amber-100 text-amber-600",
+		Miscellaneous: "bg-gray-100 text-gray-600",
+	};
+
+	// Category icons mapping
+	const categoryIcons = {
+		Housing: <CreditCard size={16} />,
+		Transportation: <ArrowLeft size={16} />,
+		Food: <DollarSign size={16} />,
+		Health: <Receipt size={16} />,
+		Entertainment: <PieChart size={16} />,
+		Personal: <Users size={16} />,
+		"Debt & Finances": <Wallet size={16} />,
+		Shopping: <Tag size={16} />,
+		Miscellaneous: <FileText size={16} />,
+	};
 
 	useEffect(() => {
 		const token = localStorage.getItem("token");
@@ -64,6 +100,62 @@ const Home = () => {
 			}
 		}
 	};
+
+	const formatDate = (dateString) => {
+		const options = { year: "numeric", month: "long", day: "numeric" };
+		const date = new Date(dateString);
+		return date.toLocaleDateString("en-US", options);
+	};
+
+	useEffect(() => {
+		if (user) {
+			const fetchGroups = async () => {
+				try {
+					const res = await axios.get(
+						"http://localhost:3000/api/groups",
+						{
+							headers: { Authorization: `Bearer ${token}` },
+						}
+					);
+					console.log("Groups data:", res.data);
+					setGroups(res.data);
+				} catch (err) {
+					console.error("Error fetching groups:", err);
+					setError("Failed to load groups. Please try again later.");
+				} finally {
+					setLoading(false);
+				}
+			};
+
+			const fetchExpensesAndTransactions = async () => {
+				setTransactionsLoading(true);
+				try {
+					const res = await axios.get(
+						"http://localhost:3000/api/expense",
+						{
+							headers: { Authorization: `Bearer ${token}` },
+						}
+					);
+
+					// Set expenses and transactions from the response
+					setExpenses(res.data.expenses || []);
+					setTransactions(res.data.transactions || []);
+				} catch (err) {
+					console.error(
+						"Error fetching expenses and transactions:",
+						err
+					);
+				} finally {
+					setTransactionsLoading(false);
+				}
+			};
+
+			fetchGroups();
+			fetchExpensesAndTransactions();
+		} else {
+			setLoading(false);
+		}
+	}, [user, token]);
 
 	if (isCheckingToken) {
 		return (
@@ -167,22 +259,130 @@ const Home = () => {
 										Recent Transactions
 									</h3>
 									<a
-										href="/transactions"
+										href="/expense"
 										className="text-sm text-emerald-600 hover:underline"
 									>
 										View All
 									</a>
 								</div>
-								<div className="text-gray-500 text-center py-12">
-									<PieChart
-										className="mx-auto text-emerald-200 mb-4"
-										size={48}
-									/>
-									<p>No recent transactions to display.</p>
-									<button className="mt-4 bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors">
-										Add an Expense
-									</button>
-								</div>
+
+								{transactionsLoading ? (
+									<div className="flex justify-center py-12">
+										<div className="w-12 h-12 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin"></div>
+									</div>
+								) : expenses.length > 0 ||
+								  transactions.length > 0 ? (
+									<div className="space-y-3">
+										{/* Show expenses first */}
+										{expenses.slice(0, 3).map((expense) => (
+											<div
+												key={`expense-${expense._id}`}
+												className="flex justify-between items-center p-3 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors"
+											>
+												<div className="flex items-center">
+													<div
+														className={`p-2 rounded-lg mr-3 ${
+															categoryColors[
+																expense.category
+															] || "bg-gray-100"
+														}`}
+													>
+														{categoryIcons[
+															expense.category
+														] || <Tag size={16} />}
+													</div>
+													<div>
+														<p className="font-medium">
+															{expense.category}
+														</p>
+														{expense.message && (
+															<p className="text-xs text-gray-500">
+																{
+																	expense.message
+																}
+															</p>
+														)}
+													</div>
+												</div>
+												<div className="text-right">
+													<p className="font-semibold">
+														₹
+														{parseFloat(
+															expense.amount
+														).toFixed(2)}
+													</p>
+													<p className="text-xs text-gray-500">
+														{formatDate(
+															expense.createdAt
+														)}
+													</p>
+												</div>
+											</div>
+										))}
+
+										{/* Then show transactions */}
+										{transactions
+											.slice(0, 3)
+											.map((transaction) => (
+												<div
+													key={`transaction-${transaction._id}`}
+													className="flex justify-between items-center p-3 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors"
+												>
+													<div className="flex items-center">
+														<div className="p-2 bg-blue-100 text-blue-600 rounded-lg mr-3">
+															<ArrowLeft
+																size={16}
+															/>
+														</div>
+														<div>
+															<p className="font-medium">
+																Payment to{" "}
+																{transaction.to
+																	?.username ||
+																	"User"}
+															</p>
+															{transaction.description && (
+																<p className="text-xs text-gray-500">
+																	{
+																		transaction.description
+																	}
+																</p>
+															)}
+														</div>
+													</div>
+													<div className="text-right">
+														<p className="font-semibold">
+															₹
+															{parseFloat(
+																transaction.amount
+															).toFixed(2)}
+														</p>
+														<p className="text-xs text-gray-500">
+															{formatDate(
+																transaction.createdAt
+															)}
+														</p>
+													</div>
+												</div>
+											))}
+									</div>
+								) : (
+									<div className="text-gray-500 text-center py-12">
+										<PieChart
+											className="mx-auto text-emerald-200 mb-4"
+											size={48}
+										/>
+										<p>
+											No recent transactions to display.
+										</p>
+										<button
+											onClick={() => navigate("/expense")}
+											className="mt-4 bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors"
+										>
+											Add an Expense
+										</button>
+									</div>
+								)}
 							</div>
 							<div className="bg-white rounded-xl shadow-sm p-6">
 								<div className="flex justify-between items-center mb-4">
@@ -201,7 +401,31 @@ const Home = () => {
 										className="mx-auto text-emerald-200 mb-4"
 										size={48}
 									/>
-									<p>No groups found.</p>
+									{loading ? (
+										<p>Loading groups...</p>
+									) : groups.length > 0 ? (
+										<ul className="list-disc list-inside text-left">
+											{groups.map((group) => (
+												<li
+													key={group._id}
+													className="mb-2"
+												>
+													<a
+														href={`/groups/${group._id}`}
+														className="text-emerald-600 hover:underline"
+													>
+														{group.groupName}
+													</a>
+												</li>
+											))}
+										</ul>
+									) : (
+										<p>
+											{error ||
+												"No groups found. Create a new group!"}
+										</p>
+									)}
+
 									<button
 										onClick={() => hanldeCreategroup()}
 										className="mt-4 bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700 transition-colors"
@@ -212,62 +436,7 @@ const Home = () => {
 							</div>
 						</div>
 
-						<div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-							<div className="bg-white rounded-xl shadow-sm p-6">
-								<div className="flex items-center justify-between mb-4">
-									<h3 className="text-lg font-medium">
-										Overall Balance
-									</h3>
-									<span className="text-emerald-600 text-xs px-2 py-1 bg-emerald-50 rounded-full">
-										Updated Today
-									</span>
-								</div>
-								<div className="flex items-center justify-center p-6">
-									<div className="text-center">
-										<p className="text-gray-500 mb-2">
-											You are owed
-										</p>
-										<p className="text-3xl font-bold text-emerald-600">
-											$0.00
-										</p>
-									</div>
-								</div>
-							</div>
-							<div className="bg-white rounded-xl shadow-sm p-6">
-								<div className="flex items-center justify-between mb-4">
-									<h3 className="text-lg font-medium">
-										Quick Actions
-									</h3>
-								</div>
-								<div className="grid grid-cols-2 gap-3">
-									<button className="p-3 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-100 transition-colors flex items-center justify-center">
-										<Receipt size={18} className="mr-2" />{" "}
-										Record Expense
-									</button>
-									<button
-										onClick={() => hanldeCreategroup()}
-										className="p-3 bg-teal-50 text-teal-600 rounded-lg hover:bg-teal-100 transition-colors flex items-center justify-center"
-									>
-										<Users size={18} className="mr-2" />
-										Add Group
-									</button>
-									<button className="p-3 bg-cyan-50 text-cyan-600 rounded-lg hover:bg-cyan-100 transition-colors flex items-center justify-center">
-										<CreditCard
-											size={18}
-											className="mr-2"
-										/>{" "}
-										Settle Up
-									</button>
-									<button className="p-3 bg-green-50 text-green-600 rounded-lg hover:bg-green-100 transition-colors flex items-center justify-center">
-										<DollarSign
-											size={18}
-											className="mr-2"
-										/>{" "}
-										Send Reminder
-									</button>
-								</div>
-							</div>
-						</div>
+						<div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6"></div>
 					</main>
 				</div>
 			) : (
