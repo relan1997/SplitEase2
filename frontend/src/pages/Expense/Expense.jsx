@@ -206,6 +206,7 @@ const Expense = () => {
 
 	const formatDate = (dateString) => {
 		const date = new Date(dateString);
+		date.setTime(date.getTime() - (5 * 60 * 60 * 1000 + 30 * 60 * 1000));
 		return (
 			date.toLocaleDateString(undefined, {
 				year: "numeric",
