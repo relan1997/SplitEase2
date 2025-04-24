@@ -35,7 +35,7 @@ const Results = () => {
 		const fetchResults = async () => {
 			try {
 				const response = await axios.get(
-					`http://localhost:3000/api/groups/${groupId}/results`,
+					`https://splitease2.onrender.com/api/groups/${groupId}/results`,
 					{
 						headers: { Authorization: `Bearer ${token}` },
 					}

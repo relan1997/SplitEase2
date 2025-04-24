@@ -41,10 +41,7 @@ app.use("/api", resultsRoutes); // Mount results routes
 app.use("/api", inviteRoutes);
 
 mongoose
-	.connect(process.env.MONGO_URI, {
-		useNewUrlParser: true,
-		useUnifiedTopology: true,
-	}) // Use MONGO_URI from .env
+	.connect(process.env.MONGO_URI) // Use MONGO_URI from .env
 	.then(() => console.log("MongoDB connected"))
 	.catch((err) => console.error("MongoDB connection error:", err));
 

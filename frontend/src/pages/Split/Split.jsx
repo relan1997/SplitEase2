@@ -37,7 +37,7 @@ const Split = () => {
 		const fetchGroupData = async () => {
 			try {
 				const membersResponse = await axios.get(
-					`http://localhost:3000/api/groups/${groupId}/members`,
+					`https://splitease2.onrender.com/api/groups/${groupId}/members`,
 					{
 						headers: { Authorization: `Bearer ${token}` },
 					}

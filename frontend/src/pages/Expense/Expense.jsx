@@ -99,7 +99,7 @@ const Expense = () => {
 		setLoading(true);
 		try {
 			const token = localStorage.getItem("token");
-			const res = await axios.get("http://localhost:3000/api/expense", {
+			const res = await axios.get("https://splitease2.onrender.com/api/expense", {
 				headers: {
 					Authorization: `Bearer ${token}`,
 				},
@@ -167,7 +167,7 @@ const Expense = () => {
 		try {
 			const token = localStorage.getItem("token");
 			const response = await axios.post(
-				"http://localhost:3000/api/expense",
+				"https://splitease2.onrender.com/api/expense",
 				formData,
 				{
 					headers: {

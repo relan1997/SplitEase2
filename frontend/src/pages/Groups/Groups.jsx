@@ -47,7 +47,7 @@ const Groups = () => {
 
 				// fetch groups after validating token
 				const res = await axios.get(
-					"http://localhost:3000/api/groups",
+					"https://splitease2.onrender.com/api/groups",
 					{
 						headers: { Authorization: `Bearer ${token}` },
 					}
@@ -80,7 +80,7 @@ const Groups = () => {
 			setLoading(true);
 			const token = localStorage.getItem("token");
 			const res = await axios.post(
-				"http://localhost:3000/api/groups",
+				"https://splitease2.onrender.com/api/groups",
 				{ name: groupName },
 				{
 					headers: { Authorization: `Bearer ${token}` },
@@ -121,7 +121,7 @@ const Groups = () => {
 		try {
 			const token = localStorage.getItem("token");
 			const res = await axios.get(
-				`http://localhost:3000/api/user-exists?username=${searchTerm}`,
+				`https://splitease2.onrender.com/api/user-exists?username=${searchTerm}`,
 				{
 					headers: { Authorization: `Bearer ${token}` },
 				}
@@ -150,7 +150,7 @@ const Groups = () => {
 			console.log(`Adding user ${uname} to group ${selectedGroup._id}`);
 			// first check if the user is already a member of the group
 			const groupMembers = await axios.get(
-				`http://localhost:3000/api/groups/${selectedGroup._id}/members`,
+				`https://splitease2.onrender.com/api/groups/${selectedGroup._id}/members`,
 				{
 					headers: { Authorization: `Bearer ${token}` },
 				}
@@ -167,7 +167,7 @@ const Groups = () => {
 				return;
 			}
 			await axios.post(
-				`http://localhost:3000/api/groups/${selectedGroup._id}/members`,
+				`https://splitease2.onrender.com/api/groups/${selectedGroup._id}/members`,
 				{ username: uname },
 				{
 					headers: { Authorization: `Bearer ${token}` },
@@ -192,7 +192,7 @@ const Groups = () => {
 		try {
 			const token = localStorage.getItem("token");
 			await axios.post(
-				`http://localhost:3000/api/send-invite`,
+				`https://splitease2.onrender.com/api/send-invite`,
 				{
 					email: inviteEmail,
 				},

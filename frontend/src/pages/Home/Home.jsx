@@ -112,7 +112,7 @@ const Home = () => {
 			const fetchGroups = async () => {
 				try {
 					const res = await axios.get(
-						"http://localhost:3000/api/groups",
+						"https://splitease2.onrender.com/api/groups",
 						{
 							headers: { Authorization: `Bearer ${token}` },
 						}
@@ -131,7 +131,7 @@ const Home = () => {
 				setTransactionsLoading(true);
 				try {
 					const res = await axios.get(
-						"http://localhost:3000/api/expense",
+						"https://splitease2.onrender.com/api/expense",
 						{
 							headers: { Authorization: `Bearer ${token}` },
 						}

@@ -36,7 +36,7 @@ const Register = () => {
 		setError("");
 
 		axios
-			.post("http://localhost:3000/api/register", {
+			.post("https://splitease2.onrender.com/api/register", {
 				username,
 				email,
 				password,

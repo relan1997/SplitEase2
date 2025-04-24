@@ -20,7 +20,7 @@ const Login = () => {
 		setError("");
 
 		axios
-			.post("http://localhost:3000/api/login", { email, password })
+			.post("https://splitease2.onrender.com/api/login", { email, password })
 			.then((res) => {
 				const { token } = res.data;
 				localStorage.setItem("token", token);
