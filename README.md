@@ -6,10 +6,6 @@
 
 Experience the application live: [https://splitease2-1-qxag.onrender.com/](https://splitease2-1-qxag.onrender.com/)
 
-## 📸 Screenshots
-
-*Include relevant screenshots here to showcase the application's interface and features.*
-
 ## 🚀 Features
 
 - **User Authentication**: Secure sign-up and login functionalities to protect user data.
