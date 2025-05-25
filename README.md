@@ -127,4 +127,3 @@ Replace \`your_mongodb_connection_string\` and \`your_jwt_secret_key\` with your
 ## 📄 License
 
 This project is licensed under the [MIT License](LICENSE).
-EOF
