@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 
+const URL = import.meta.env.VITE_API_URL;
 const Results = () => {
 	const { groupId } = useParams();
 	const navigate = useNavigate();
@@ -11,6 +12,8 @@ const Results = () => {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
 	const [noTransactions, setNoTransactions] = useState(false);
+	const [selectedTransactions, setSelectedTransactions] = useState([]);
+	const [submitting, setSubmitting] = useState(false);
 
 	useEffect(() => {
 		const token = localStorage.getItem("token");
@@ -35,7 +38,7 @@ const Results = () => {
 		const fetchResults = async () => {
 			try {
 				const response = await axios.get(
-					`https://splitease2.onrender.com/api/groups/${groupId}/results`,
+					`${URL}/api/groups/${groupId}/results`,
 					{
 						headers: { Authorization: `Bearer ${token}` },
 					}
@@ -62,6 +65,61 @@ const Results = () => {
 		fetchResults();
 	}, [groupId, navigate]);
 
+	const handleTransactionSelect = (index, isChecked) => {
+		if (isChecked) {
+			setSelectedTransactions(prev => [...prev, index]);
+		} else {
+			setSelectedTransactions(prev => prev.filter(i => i !== index));
+		}
+	};
+
+	const handleSubmit = async () => {
+		const token = localStorage.getItem("token");
+		if (!token) {
+			navigate("/login");
+			return;
+		}
+
+		if (selectedTransactions.length === 0) {
+			alert("Please select at least one transaction to submit.");
+			return;
+		}
+
+		setSubmitting(true);
+
+		try {
+			const transactionsToSubmit = selectedTransactions.map(index => {
+				const payment = results.paymentPlan[index];
+				return {
+					from: payment.fromId,
+					to: payment.toId,
+					amount: payment.amount.toFixed(2),
+				};
+			});
+
+			console.log("Submitting transactions:", transactionsToSubmit);
+
+			// Send each transaction
+			for (const transaction of transactionsToSubmit) {
+				await axios.post(
+					`${URL}/api/groups/${groupId}/transactions`,
+					transaction,
+					{
+						headers: { Authorization: `Bearer ${token}` },
+					}
+				);
+			}
+
+			// Reload the page after successful submission
+			window.location.reload();
+		} catch (err) {
+			console.error("Error submitting transactions:", err);
+			alert("Failed to submit transactions. Please try again.");
+		} finally {
+			setSubmitting(false);
+		}
+	};
+
 	if (loading) {
 		return (
 			<div className="flex justify-center items-center p-8">
@@ -77,6 +135,10 @@ const Results = () => {
 			</div>
 		);
 	}
+
+	// Filter out payments less than 1.00
+	const filteredPaymentPlan = results?.paymentPlan?.filter(payment => payment.amount >= 1.00) || [];
+	const showAllCleared = filteredPaymentPlan.length === 0 && results?.paymentPlan?.length > 0;
 
 	return (
 		<div className="max-w-4xl mx-auto px-4 py-8">
@@ -192,57 +254,90 @@ const Results = () => {
 						<h2 className="text-lg font-medium text-gray-900 mb-4">
 							Settlement Plan
 						</h2>
-						{results?.paymentPlan?.length > 0 ? (
-							<div className="bg-white rounded-lg border border-gray-200">
-								<ul className="divide-y divide-gray-200">
-									{results.paymentPlan.map(
-										(payment, index) => (
-											<li
-												key={index}
-												className="p-4 hover:bg-gray-50"
-											>
-												<div className="flex items-center justify-between">
-													<div className="flex items-center space-x-3">
-														<div className="flex flex-col">
-															<span className="font-medium text-gray-900">
-																{
-																	payment.fromName
-																}
-															</span>
-															<span className="text-sm text-gray-500">
-																pays
-															</span>
-														</div>
-														<svg
-															xmlns="http://www.w3.org/2000/svg"
-															className="h-5 w-5 text-gray-400"
-															viewBox="0 0 20 20"
-															fill="currentColor"
-														>
-															<path
-																fillRule="evenodd"
-																d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z"
-																clipRule="evenodd"
-															/>
-														</svg>
-														<div className="flex flex-col">
-															<span className="font-medium text-gray-900">
-																{payment.toName}
-															</span>
-														</div>
-													</div>
-													<div className="font-semibold text-green-600">
-														$
-														{payment.amount.toFixed(
-															2
-														)}
-													</div>
-												</div>
-											</li>
-										)
-									)}
-								</ul>
+						{showAllCleared ? (
+							<div className="bg-gray-50 p-6 text-center rounded-lg border border-dashed border-gray-300">
+								<p className="text-gray-500">
+									All cleared! No payments needed.
+								</p>
 							</div>
+						) : filteredPaymentPlan.length > 0 ? (
+							<>
+								<div className="bg-white rounded-lg border border-gray-200">
+									<ul className="divide-y divide-gray-200">
+										{filteredPaymentPlan.map(
+											(payment, index) => (
+												<li
+													key={index}
+													className="p-4 hover:bg-gray-50"
+												>
+													<div className="flex items-center justify-between">
+														<div className="flex items-center space-x-3">
+															<input
+																type="checkbox"
+																checked={selectedTransactions.includes(index)}
+																onChange={(e) => handleTransactionSelect(index, e.target.checked)}
+																className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
+															/>
+															<div className="flex flex-col">
+																<span className="font-medium text-gray-900">
+																	{
+																		payment.fromName
+																	}
+																</span>
+																<span className="text-sm text-gray-500">
+																	pays
+																</span>
+															</div>
+															<svg
+																xmlns="http://www.w3.org/2000/svg"
+																className="h-5 w-5 text-gray-400"
+																viewBox="0 0 20 20"
+																fill="currentColor"
+															>
+																<path
+																	fillRule="evenodd"
+																	d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z"
+																	clipRule="evenodd"
+																/>
+															</svg>
+															<div className="flex flex-col">
+																<span className="font-medium text-gray-900">
+																	{payment.toName}
+																</span>
+															</div>
+														</div>
+														<div className="font-semibold text-green-600">
+															$
+															{payment.amount.toFixed(
+																2
+															)}
+														</div>
+													</div>
+												</li>
+											)
+										)}
+									</ul>
+								</div>
+								
+								{selectedTransactions.length > 0 && (
+									<div className="mt-4 text-center">
+										<button
+											onClick={handleSubmit}
+											disabled={submitting}
+											className="inline-flex items-center px-6 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+										>
+											{submitting ? (
+												<>
+													<div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+													Submitting...
+												</>
+											) : (
+												`Submit ${selectedTransactions.length} Transaction${selectedTransactions.length !== 1 ? 's' : ''}`
+											)}
+										</button>
+									</div>
+								)}
+							</>
 						) : (
 							<div className="bg-gray-50 p-6 text-center rounded-lg border border-dashed border-gray-300">
 								<p className="text-gray-500">

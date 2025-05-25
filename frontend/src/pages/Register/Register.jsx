@@ -12,6 +12,7 @@ import {
 	EyeOff,
 } from "lucide-react";
 
+const URL = import.meta.env.VITE_API_URL;
 const Register = () => {
 	const [username, setUsername] = useState("");
 	const [email, setEmail] = useState("");
@@ -36,7 +37,7 @@ const Register = () => {
 		setError("");
 
 		axios
-			.post("https://splitease2.onrender.com/api/register", {
+			.post(`${URL}/api/register`, {
 				username,
 				email,
 				password,

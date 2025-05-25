@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import Transactions from "../Transactions/Transactions";
-
+const URL = import.meta.env.VITE_API_URL;
 const Split = () => {
 	const navigate = useNavigate();
 	const { groupId } = useParams();
@@ -37,7 +37,7 @@ const Split = () => {
 		const fetchGroupData = async () => {
 			try {
 				const membersResponse = await axios.get(
-					`https://splitease2.onrender.com/api/groups/${groupId}/members`,
+					`${URL}/api/groups/${groupId}/members`,
 					{
 						headers: { Authorization: `Bearer ${token}` },
 					}

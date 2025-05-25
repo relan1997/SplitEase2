@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+const URL = import.meta.env.VITE_API_URL;
 const Expense = () => {
 	const [formData, setFormData] = useState({
 		amount: "",
@@ -100,7 +100,7 @@ const Expense = () => {
 		try {
 			const token = localStorage.getItem("token");
 			const res = await axios.get(
-				"https://splitease2.onrender.com/api/expense",
+				`${URL}/api/expense`,
 				{
 					headers: {
 						Authorization: `Bearer ${token}`,
@@ -170,7 +170,7 @@ const Expense = () => {
 		try {
 			const token = localStorage.getItem("token");
 			const response = await axios.post(
-				"https://splitease2.onrender.com/api/expense",
+				`${URL}/api/expense`,
 				formData,
 				{
 					headers: {

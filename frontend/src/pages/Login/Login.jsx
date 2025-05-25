@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Wallet, Mail, Lock, ArrowRight, Loader } from "lucide-react";
 
+const URL = import.meta.env.VITE_API_URL;
 const Login = () => {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
@@ -20,7 +21,7 @@ const Login = () => {
 		setError("");
 
 		axios
-			.post("https://splitease2.onrender.com/api/login", { email, password })
+			.post(`${URL}/api/login`, { email, password })
 			.then((res) => {
 				const { token } = res.data;
 				localStorage.setItem("token", token);

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
-
+const URL = import.meta.env.VITE_API_URL;
 const Transactions = ({ groupId }) => {
 	const navigate = useNavigate();
 	const [transactions, setTransactions] = useState([]);
@@ -48,11 +48,11 @@ const Transactions = ({ groupId }) => {
 			try {
 				const [txRes, membersRes] = await Promise.all([
 					axios.get(
-						`https://splitease2.onrender.com/api/groups/${groupId}/transactions`,
+						`${URL}/api/groups/${groupId}/transactions`,
 						{ headers }
 					),
 					axios.get(
-						`https://splitease2.onrender.com/api/groups/${groupId}/members`,
+						`${URL}/api/groups/${groupId}/members`,
 						{ headers }
 					),
 				]);
@@ -120,7 +120,7 @@ const Transactions = ({ groupId }) => {
 					.filter((toId) => toId !== fromUser._id) // skip self-transactions
 					.map(async (toId) => {
 						const res = await axios.post(
-							`https://splitease2.onrender.com/api/groups/${groupId}/transactions`,
+							`${URL}/api/groups/${groupId}/transactions`,
 							{
 								from: fromUser._id,
 								to: toId,
@@ -151,7 +151,7 @@ const Transactions = ({ groupId }) => {
 		const token = localStorage.getItem("token");
 		try {
 			await axios.delete(
-				`https://splitease2.onrender.com/api/groups/${groupId}/transactions/${transactionId}`,
+				`${URL}/api/groups/${groupId}/transactions/${transactionId}`,
 				{
 					headers: { Authorization: `Bearer ${token}` },
 				}

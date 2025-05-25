@@ -14,7 +14,7 @@ import {
 	Tag,
 	ArrowLeft,
 } from "lucide-react";
-
+const URL = import.meta.env.VITE_API_URL;
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -112,7 +112,7 @@ const Home = () => {
 			const fetchGroups = async () => {
 				try {
 					const res = await axios.get(
-						"https://splitease2.onrender.com/api/groups",
+						`${URL}/api/groups`,
 						{
 							headers: { Authorization: `Bearer ${token}` },
 						}
@@ -131,7 +131,7 @@ const Home = () => {
 				setTransactionsLoading(true);
 				try {
 					const res = await axios.get(
-						"https://splitease2.onrender.com/api/expense",
+						`${URL}/api/expense`,
 						{
 							headers: { Authorization: `Bearer ${token}` },
 						}
