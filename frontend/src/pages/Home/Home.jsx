@@ -440,7 +440,7 @@ const Home = () => {
 					</main>
 				</div>
 			) : (
-				/* Guest user experience */
+				/* Guest user experience - All clickable elements route to /register */
 				<div className="max-w-6xl mx-auto px-4 py-10">
 					<header className="flex justify-between items-center mb-12">
 						<div className="flex items-center">
@@ -550,48 +550,38 @@ const Home = () => {
 								<div className="bg-emerald-100 p-3 rounded-full mb-4">
 									<Receipt className="text-emerald-600" />
 								</div>
-								<button onClick={handleProtectedAction}>
-									<h3 className="text-xl font-medium mb-2">
-										Track Expenses
-									</h3>
-									<p className="text-gray-600">
-										Easily record expenses and keep track of
-										who owes what within your groups.
-									</p>
-								</button>
+								<h3 className="text-xl font-medium mb-2">
+									Track Expenses
+								</h3>
+								<p className="text-gray-600">
+									Easily record expenses and keep track of
+									who owes what within your groups.
+								</p>
 							</div>
 							<div className="bg-white p-6 rounded-xl shadow-sm flex flex-col items-center text-center">
 								<div className="bg-teal-100 p-3 rounded-full mb-4">
 									<Users className="text-teal-600" />
 								</div>
-								<button
-									onClick={() =>
-										handleProtectedAction("groups")
-									}
-								>
-									<h3 className="text-xl font-medium mb-2">
-										Create Groups
-									</h3>
-									<p className="text-gray-600">
-										Organize your expenses by creating
-										different groups for different
-										situations.
-									</p>
-								</button>
+								<h3 className="text-xl font-medium mb-2">
+									Create Groups
+								</h3>
+								<p className="text-gray-600">
+									Organize your expenses by creating
+									different groups for different
+									situations.
+								</p>
 							</div>
 							<div className="bg-white p-6 rounded-xl shadow-sm flex flex-col items-center text-center">
 								<div className="bg-cyan-100 p-3 rounded-full mb-4">
 									<CreditCard className="text-cyan-600" />
 								</div>
-								<button onClick={handleProtectedAction}>
-									<h3 className="text-xl font-medium mb-2">
-										Settle Up
-									</h3>
-									<p className="text-gray-600">
-										Settle debts easily and keep track of
-										your payment history.
-									</p>
-								</button>
+								<h3 className="text-xl font-medium mb-2">
+									Settle Up
+								</h3>
+								<p className="text-gray-600">
+									Settle debts easily and keep track of
+									your payment history.
+								</p>
 							</div>
 						</div>
 
@@ -623,18 +613,10 @@ const Home = () => {
 								</span>
 							</div>
 							<div className="flex gap-4 text-sm text-gray-500">
-								<a href="/" className="hover:text-emerald-600">
-									About
-								</a>
-								<a href="/" className="hover:text-emerald-600">
-									Contact
-								</a>
-								<a href="/" className="hover:text-emerald-600">
-									Privacy Policy
-								</a>
-								<a href="/" className="hover:text-emerald-600">
-									Terms of Service
-								</a>
+								<span>About</span>
+								<span>Contact</span>
+								<span>Privacy Policy</span>
+								<span>Terms of Service</span>
 							</div>
 						</div>
 					</footer>
