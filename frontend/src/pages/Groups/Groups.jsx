@@ -154,65 +154,65 @@ const Groups = () => {
   };
 
   const handleAddUser = async (uname) => {
-  try {
-    const token = localStorage.getItem("token");
-    console.log(`Adding user ${uname} to group ${selectedGroup._id}`);
-    
-    // first check if the user is already a member of the group
-    const groupMembers = await axios.get(
-      `${URL}/api/groups/${selectedGroup._id}/members`,
-      {
-        headers: { Authorization: `Bearer ${token}` },
+    try {
+      const token = localStorage.getItem("token");
+      console.log(`Adding user ${uname} to group ${selectedGroup._id}`);
+
+      // first check if the user is already a member of the group
+      const groupMembers = await axios.get(
+        `${URL}/api/groups/${selectedGroup._id}/members`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      console.log("Group members:", groupMembers);
+      const isMember = groupMembers.data.some(
+        (member) => member.username === uname
+      );
+      if (isMember) {
+        showNotification("User is already a member of the group", "error");
+        return;
       }
-    );
-    console.log("Group members:", groupMembers);
-    const isMember = groupMembers.data.some(
-      (member) => member.username === uname
-    );
-    if (isMember) {
-      showNotification("User is already a member of the group", "error");
-      return;
+
+      await axios.post(
+        `${URL}/api/groups/${selectedGroup._id}/members`,
+        { username: uname },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      // Update the local groups state to reflect the new member count
+      setGroups((prevGroups) =>
+        prevGroups.map((group) =>
+          group._id === selectedGroup._id
+            ? {
+                ...group,
+                members: group.members
+                  ? [...group.members, { username: uname }]
+                  : [{ username: uname }],
+              }
+            : group
+        )
+      );
+
+      // Also update the selectedGroup to keep it in sync
+      setSelectedGroup((prevGroup) => ({
+        ...prevGroup,
+        members: prevGroup.members
+          ? [...prevGroup.members, { username: uname }]
+          : [{ username: uname }],
+      }));
+
+      showNotification("User added to group successfully!", "success");
+      setSearchTerm("");
+      setSearchResults([]);
+      setShowAddPeople(false);
+    } catch (err) {
+      console.error("Error adding user to group:", err);
+      showNotification("Failed to add user to group", "error");
     }
-    
-    await axios.post(
-      `${URL}/api/groups/${selectedGroup._id}/members`,
-      { username: uname },
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
-
-    // Update the local groups state to reflect the new member count
-    setGroups(prevGroups => 
-      prevGroups.map(group => 
-        group._id === selectedGroup._id 
-          ? { 
-              ...group, 
-              members: group.members 
-                ? [...group.members, { username: uname }] 
-                : [{ username: uname }]
-            }
-          : group
-      )
-    );
-
-    // Also update the selectedGroup to keep it in sync
-    setSelectedGroup(prevGroup => ({
-      ...prevGroup,
-      members: prevGroup.members 
-        ? [...prevGroup.members, { username: uname }] 
-        : [{ username: uname }]
-    }));
-
-    showNotification("User added to group successfully!", "success");
-    setSearchTerm("");
-    setSearchResults([]);
-    setShowAddPeople(false);
-  } catch (err) {
-    console.error("Error adding user to group:", err);
-    showNotification("Failed to add user to group", "error");
-  }
-};
+  };
 
   const handleInviteUser = async () => {
     if (!inviteEmail.trim()) {
@@ -246,7 +246,10 @@ const Groups = () => {
     <div className="min-h-screen bg-gradient-to-b from-emerald-50 to-white">
       <header className="bg-white shadow-sm">
         <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center">
+          <div
+            className="flex items-center cursor-pointer hover:opacity-80 transition-opacity"
+            onClick={() => navigate("/")}
+          >
             <div className="bg-emerald-600 text-white p-2 rounded-lg mr-2">
               <Wallet size={24} />
             </div>
@@ -396,7 +399,7 @@ const Groups = () => {
                             className="text-emerald-600 hover:bg-emerald-50 p-1 rounded"
                             title="View Transactions"
                           > */}
-                            {/* <CreditCard size={18} /> */}
+                          {/* <CreditCard size={18} /> */}
                           {/* </button> */}
                         </div>
                       </div>
