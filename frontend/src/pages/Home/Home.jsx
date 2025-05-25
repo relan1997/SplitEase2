@@ -215,7 +215,7 @@ const Home = () => {
 							</p>
 
 							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
-								<div className="bg-emerald-50 p-4 rounded-lg border border-emerald-100 hover:shadow-md transition-shadow">
+								<div className="bg-emerald-50 p-4 rounded-lg border border-emerald-100">
 									<DollarSign className="text-emerald-500 mb-2" />
 									<h3 className="font-medium">
 										Track Expenses
@@ -224,7 +224,7 @@ const Home = () => {
 										Record and categorize your spending
 									</p>
 								</div>
-								<div className="bg-teal-50 p-4 rounded-lg border border-teal-100 hover:shadow-md transition-shadow">
+								<div className="bg-teal-50 p-4 rounded-lg border border-teal-100">
 									<Users className="text-teal-500 mb-2" />
 									<h3 className="font-medium">
 										Manage Groups
@@ -233,14 +233,14 @@ const Home = () => {
 										Create and join expense groups
 									</p>
 								</div>
-								<div className="bg-cyan-50 p-4 rounded-lg border border-cyan-100 hover:shadow-md transition-shadow">
+								<div className="bg-cyan-50 p-4 rounded-lg border border-cyan-100">
 									<Receipt className="text-cyan-500 mb-2" />
 									<h3 className="font-medium">Split Bills</h3>
 									<p className="text-sm text-gray-600 mt-1">
 										Divide expenses fairly among friends
 									</p>
 								</div>
-								<div className="bg-green-50 p-4 rounded-lg border border-green-100 hover:shadow-md transition-shadow">
+								<div className="bg-green-50 p-4 rounded-lg border border-green-100">
 									<Clock className="text-green-500 mb-2" />
 									<h3 className="font-medium">
 										View History
@@ -546,7 +546,7 @@ const Home = () => {
 						</div>
 
 						<div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-							<div className="bg-white p-6 rounded-xl shadow-sm flex flex-col items-center text-center hover:shadow-md transition-shadow">
+							<div className="bg-white p-6 rounded-xl shadow-sm flex flex-col items-center text-center">
 								<div className="bg-emerald-100 p-3 rounded-full mb-4">
 									<Receipt className="text-emerald-600" />
 								</div>
@@ -560,7 +560,7 @@ const Home = () => {
 									</p>
 								</button>
 							</div>
-							<div className="bg-white p-6 rounded-xl shadow-sm flex flex-col items-center text-center hover:shadow-md transition-shadow">
+							<div className="bg-white p-6 rounded-xl shadow-sm flex flex-col items-center text-center">
 								<div className="bg-teal-100 p-3 rounded-full mb-4">
 									<Users className="text-teal-600" />
 								</div>
@@ -579,7 +579,7 @@ const Home = () => {
 									</p>
 								</button>
 							</div>
-							<div className="bg-white p-6 rounded-xl shadow-sm flex flex-col items-center text-center hover:shadow-md transition-shadow">
+							<div className="bg-white p-6 rounded-xl shadow-sm flex flex-col items-center text-center">
 								<div className="bg-cyan-100 p-3 rounded-full mb-4">
 									<CreditCard className="text-cyan-600" />
 								</div>
